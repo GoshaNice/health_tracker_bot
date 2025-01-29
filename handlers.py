@@ -23,7 +23,7 @@ async def cmd_help(message: Message):
         "/set_profile - Настройка профиля\n"
         "/log_water <кол-во в мл> - Логгирование потребленной воды\n"
         "/log_food <продукт> - Логгирование потребленной пищи\n"
-        "/log_workout <тип тренировки> <длительностьь в минутах> - Логгирование тренировки\n"
+        "/log_workout <тип тренировки> <длительность в минутах> - Логгирование тренировки\n"
         "/check_progress - Текущий прогресс"
     )
 
@@ -104,7 +104,12 @@ async def log_water(message: Message):
     logged_water = data.get("logged_water", 0)
     logged_water += float(message.text.split()[1])
     users_data[username]["logged_water"] = logged_water
-    await message.answer(f"За сегодня вы выпили {logged_water} из {base_water_norm} мл воды")
+    remaining_water = max(0, base_water_norm - logged_water)
+    if remaining_water > 0:
+        message_remaining = f"Сегодня нужно выпить еще {remaining_water} мл."
+    else:
+        message_remaining = f"Вы выполнили норму, отлично!"
+    await message.answer(f"За сегодня вы выпили {logged_water} из {base_water_norm} мл воды. {message_remaining}")
 
 
 @router.message(Command("log_food"))
